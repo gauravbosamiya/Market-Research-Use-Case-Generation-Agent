@@ -12,7 +12,6 @@ class SafeTavilySearch(TavilySearch):
         except Exception as e:
             return f"[Tavily API Error: {str(e)}]"
 
-# Tool must be registered with a name
 @tool("tavily_search")
 def tavily_search(query: str, max_results: int = 5) -> str:
     """ Perform a Tavily search for a given query. 
