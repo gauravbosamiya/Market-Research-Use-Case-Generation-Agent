@@ -18,7 +18,6 @@ st.set_page_config(
 )
 
 def create_pdf_report(result_data):
-    """Generate a comprehensive PDF report from the proposal data"""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=72, leftMargin=72,
                            topMargin=72, bottomMargin=18)
@@ -268,9 +267,6 @@ if submitted and st.session_state.user_prompt.strip():
 if st.session_state.result:
     result = st.session_state.result
 
-    with st.expander("🔍 Debug: Raw Output"):
-        st.json(result)
-
     if "company_research" in result:
         st.subheader("🏢 Company Research")
         cr = result["company_research"]
@@ -378,14 +374,6 @@ if st.session_state.result:
             file_name=f"AI_ML_Proposal_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
             mime="application/pdf"
         )
-        
-        with st.expander("Alternative Download Options"):
-            st.download_button(
-                label="⬇️ Download Raw Data (JSON)",
-                data=json.dumps(result, indent=2, default=str),
-                file_name="ai_ml_proposal.json",
-                mime="application/json"
-            )
             
     except Exception as e:
         st.error(f"Error generating PDF: {str(e)}")
@@ -396,3 +384,6 @@ if st.session_state.result:
             file_name="ai_ml_proposal.json",
             mime="application/json"
         )
+        
+        
+# AI Planet industry, key offerings, and strategic focus areas
