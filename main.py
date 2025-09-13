@@ -336,22 +336,6 @@ if st.session_state.result:
         st.subheader("🏆 Priority Ranking")
         st.markdown("\n".join([f"{i+1}. {p}" for i, p in enumerate(uc_data.priority_ranking)]))
 
-    # if "resource_assets" in result:
-    #     st.subheader("🔗 Resource Assets")
-    #     ra: ResourceAssets = result["resource_assets"]
-
-    #     for res in ra.use_case_resources:
-    #         with st.expander(f"{res.use_case_title} ({res.category})"):
-    #             st.markdown(f"**Focus:** {res.technology_focus}")
-    #             if res.kaggle_datasets:
-    #                 st.markdown("**Kaggle Datasets:** " + " | ".join([f"[{k}]({k})" for k in res.kaggle_datasets]))
-    #             if res.huggingface_resources:
-    #                 st.markdown("**HuggingFace Models:** " + " | ".join([f"[{h}]({h})" for h in res.huggingface_resources]))
-    #             if res.github_repositories:
-    #                 st.markdown("**GitHub Repos:** " + " | ".join([f"[{g}]({g})" for g in res.github_repositories]))
-    #             if res.additional_resources:
-    #                 st.markdown("**Additional Resources:** " + " | ".join([f"[{a}]({a})" for a in res.additional_resources]))
-
     if "final_proposal" in result:
         st.subheader("📋 Final Proposal")
         fp = result["final_proposal"]
@@ -408,5 +392,5 @@ if st.session_state.result:
             mime="application/json"
         )
         
-        
+      
 # AI Planet industry, key offerings, and strategic focus areas
