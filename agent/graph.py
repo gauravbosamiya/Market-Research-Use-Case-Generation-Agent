@@ -8,12 +8,15 @@ from typing import TypedDict
 from datetime import datetime
 import tiktoken
 import re
+import os
 from urllib.parse import urlparse
 
 
 load_dotenv()
 
-llm = ChatGroq(model="meta-llama/llama-4-maverick-17b-128e-instruct")
+api_key = os.getenv("GROQ_API_KEY")
+
+llm = ChatGroq(model="meta-llama/llama-4-maverick-17b-128e-instruct", api_key=api_key)
 
 def count_tokens(text: str, model_name: str = "gpt-3.5-turbo") -> int:
     try:

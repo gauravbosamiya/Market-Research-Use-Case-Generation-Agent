@@ -10,6 +10,29 @@ from reportlab.lib.colors import HexColor, black, blue
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY
 from io import BytesIO
 from datetime import datetime
+from langchain_groq import ChatGroq
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+def get_api_key():
+    try:
+        return st.secrets["GROQ_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        pass
+    
+    api_key = os.getenv("GROQ_API_KEY")
+    if api_key:
+        return api_key
+    
+    st.error("GROQ_API_KEY not configured!")
+    st.stop()
+
+api_key = get_api_key()
+llm = ChatGroq(
+    model="meta-llama/llama-4-maverick-17b-128e-instruct",
+    api_key=api_key
+)
 
 st.set_page_config(
     page_title="AI/ML Proposal Generator",
