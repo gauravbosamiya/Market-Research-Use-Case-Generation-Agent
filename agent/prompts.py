@@ -138,29 +138,29 @@ def ResourceCollectionPrompt() -> PromptTemplate:
         
         For each use case, extract and organize:
         
-        KAGGLE RESOURCES:
-        - Relevant datasets that support the use case
-        - Focus on datasets with good quality ratings and recent updates
-        - Include both structured and unstructured data sources
-        - Consider datasets for training, validation, and benchmarking
+        KAGGLE DATASETS:
+        - Focus on datasets relevant to the use case domain
+        - Include both training and benchmark datasets
+        - Prefer datasets with high usability scores
+        - Examples: customer data, sales data, image datasets, text corpora
         
         HUGGINGFACE RESOURCES:
-        - Pre-trained models relevant to the use case
-        - Datasets available on HuggingFace Hub
-        - Tokenizers and processing tools
-        - Model cards and documentation
+        - Pre-trained models that can be fine-tuned for the use case
+        - Relevant datasets from HuggingFace Hub
+        - Spaces with working demos
+        - Examples: bert-base-uncased, gpt2, stable-diffusion, sentiment analysis models
         
         GITHUB REPOSITORIES:
-        - Implementation repositories and code examples
-        - Open-source frameworks and tools
-        - Tutorial and educational repositories
-        - End-to-end project examples
+        - Implementation examples and tutorials
+        - Open-source frameworks and libraries
+        - End-to-end project templates
+        - Industry-specific implementations
         
         ADDITIONAL RESOURCES:
-        - Research papers and documentation
-        - API endpoints and services
-        - Cloud platform resources
-        - Industry-specific tools and platforms
+        - Research papers and white papers
+        - Documentation and tutorials
+        - API services and cloud resources
+        - Industry reports and case studies
         
         For each resource, provide:
         1. Clear title and description
@@ -190,6 +190,13 @@ def ResourceCollectionPrompt() -> PromptTemplate:
         - Well-documented
         - Relevant to the specific industry and use cases
         - Accessible and free to use where possible
+        
+        REQUIREMENTS:
+        1. Generate resources for ALL use cases provided
+        2. Each list must contain exactly 3 URLs
+        3. URLs must be realistic and properly formatted
+        4. Focus on resources that support the specific technology focus        
+
         """
     
     prompt = PromptTemplate(
@@ -197,3 +204,4 @@ def ResourceCollectionPrompt() -> PromptTemplate:
         input_variables=["company", "industry", "use_cases", "resource_searches"]
     )
     return prompt
+
