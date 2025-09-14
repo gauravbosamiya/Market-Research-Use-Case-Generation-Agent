@@ -261,7 +261,7 @@ with st.form("proposal_form"):
     submitted = st.form_submit_button("Generate Proposal")
 
 if submitted and st.session_state.user_prompt.strip():
-    with st.spinner("Generating proposal... please wait it will take 3-5 minutes"):
+    with st.spinner("Generating proposal... please wait it will take 3-5 minutes ⌛"):
         try:
             st.session_state.result = workflow.invoke(
                 {"user_prompt": st.session_state.user_prompt}
