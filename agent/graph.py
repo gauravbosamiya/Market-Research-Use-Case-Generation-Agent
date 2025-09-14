@@ -125,58 +125,6 @@ def use_case_generator(state: ResearchState):
     return {"use_cases": use_cases}
 
 
-# def extract_real_urls(search_results: str, platform: str) -> list:
-#     urls = []
-#     lines = str(search_results).split('\n')
-    
-#     platform_patterns = {
-#         'kaggle': r'https://www\.kaggle\.com/[^\s]+',
-#         'huggingface': r'https://huggingface\.co/[^\s]+',
-#         'github': r'https://github\.com/[^\s]+'
-#     }
-    
-#     pattern = platform_patterns.get(platform.lower())
-#     if not pattern:
-#         return []
-    
-#     for line in lines:
-#         found_urls = re.findall(pattern, line)
-#         for url in found_urls:
-#             clean_url = re.sub(r'[.,;)]+$', '', url)
-#             if clean_url not in [u['url'] for u in urls]:
-#                 title = extract_title_from_line(line, clean_url)
-#                 urls.append({
-#                     'url': clean_url,
-#                     'title': title,
-#                     'line_context': line[:200]
-#                 })
-    
-#     return urls[:5] 
-
-# def extract_title_from_line(line: str, url: str) -> str:
-#     line_without_url = line.replace(url, '').strip()
-
-#     title_patterns = [
-#         r'^([^-|•]+)[-|•]', 
-#         r'"([^"]+)"',        
-#         r'([A-Z][^.!?]*[.!?])', 
-#         r'^([^:]+):',        
-#     ]
-    
-#     for pattern in title_patterns:
-#         match = re.search(pattern, line_without_url)
-#         if match:
-#             title = match.group(1).strip()
-#             if len(title) > 10 and len(title) < 100: 
-#                 return title
-    
-#     parsed = urlparse(url)
-#     path_parts = [part for part in parsed.path.split('/') if part]
-#     if path_parts:
-#         return path_parts[-1].replace('-', ' ').replace('_', ' ').title()
-    
-#     return f"{parsed.netloc.replace('www.', '').title()} Resource"
-
 def create_resource_description(title: str, platform: str, use_case_category: str) -> str:
     descriptions = {
         'kaggle': {
@@ -202,142 +150,23 @@ def create_resource_description(title: str, platform: str, use_case_category: st
     platform_desc = descriptions.get(platform.lower(), {})
     return platform_desc.get(use_case_category.lower(), platform_desc['default'])
 
-# def resource_collector(state: ResearchState):
-#     use_cases = state["use_cases"]
-#     company_research = state["company_research"]
-    
-#     structured_llm = llm.with_structured_output(ResourceAssets)
-    
-#     limited_use_cases = use_cases.use_cases[:4]
-    
-#     all_use_case_resources = []
-#     total_kaggle = 0
-#     total_huggingface = 0 
-#     total_github = 0
-    
-#     for use_case in limited_use_cases:
-#         print(f"Searching resources for: {use_case.title}")
-        
-#         kaggle_query = f"site:kaggle.com {use_case.category} {company_research.Industry} dataset {use_case.ai_ml_solution}"
-#         huggingface_query = f"site:huggingface.co {use_case.ai_ml_solution} {use_case.category} model"
-#         github_query = f"site:github.com {use_case.ai_ml_solution} {use_case.category} {company_research.Industry}"
-        
-#         kaggle_results = tavily_search.invoke(kaggle_query)
-#         huggingface_results = tavily_search.invoke(huggingface_query)
-#         github_results = tavily_search.invoke(github_query)
-        
-#         kaggle_urls = extract_real_urls(kaggle_results, 'kaggle')
-#         huggingface_urls = extract_real_urls(huggingface_results, 'huggingface')
-#         github_urls = extract_real_urls(github_results, 'github')
-        
-#         kaggle_resources = []
-#         for url_data in kaggle_urls:
-#             kaggle_resources.append(ResourceLink(
-#                 title=url_data['title'],
-#                 url=url_data['url'],
-#                 description=create_resource_description(url_data['title'], 'kaggle', use_case.category)
-#             ))
-        
-#         huggingface_resources = []
-#         for url_data in huggingface_urls:
-#             huggingface_resources.append(ResourceLink(
-#                 title=url_data['title'],
-#                 url=url_data['url'],
-#                 description=create_resource_description(url_data['title'], 'huggingface', use_case.category)
-#             ))
-        
-#         github_resources = []
-#         for url_data in github_urls:
-#             github_resources.append(ResourceLink(
-#                 title=url_data['title'],
-#                 url=url_data['url'],
-#                 description=create_resource_description(url_data['title'], 'github', use_case.category)
-#             ))
-        
-#         use_case_resource = UseCaseResource(
-#             use_case_title=use_case.title,
-#             category=use_case.category,
-#             technology_focus=use_case.ai_ml_solution,
-#             kaggle_datasets=kaggle_resources,
-#             huggingface_resources=huggingface_resources,
-#             github_repositories=github_resources,
-#             additional_resources=[] 
-#         )
-        
-#         all_use_case_resources.append(use_case_resource)
-        
-#         total_kaggle += len(kaggle_resources)
-#         total_huggingface += len(huggingface_resources)
-#         total_github += len(github_resources)
-        
-#         print(f"Found: {len(kaggle_resources)} Kaggle, {len(huggingface_resources)} HuggingFace, {len(github_resources)} GitHub")
-    
-#     platform_summary = PlatformSummary(
-#         kaggle_count=total_kaggle,
-#         huggingface_count=total_huggingface,
-#         github_count=total_github,
-#         kaggle_recommendations=[f"{res.kaggle_datasets[0].title}" for res in all_use_case_resources if res.kaggle_datasets][:5],
-#         huggingface_recommendations=[f"{res.huggingface_resources[0].title}" for res in all_use_case_resources if res.huggingface_resources][:5],
-#         github_recommendations=[f"{res.github_repositories[0].title}" for res in all_use_case_resources if res.github_repositories][:5]
-#     )
-    
-#     implementation_phases = [
-#         ImplementationPhase(
-#             phase_name="Quick Wins & Proof of Concept",
-#             timeline="6-12 weeks",
-#             priority="High",
-#             use_cases=[uc.title for uc in limited_use_cases[:2]],
-#             key_resources=["Data preparation", "Model selection", "Initial training"]
-#         ),
-#         ImplementationPhase(
-#             phase_name="Core Implementation",
-#             timeline="3-6 months", 
-#             priority="High",
-#             use_cases=[uc.title for uc in limited_use_cases[2:4]],
-#             key_resources=["Full model development", "Integration", "Testing"]
-#         ),
-#         ImplementationPhase(
-#             phase_name="Advanced Features & Scale",
-#             timeline="6-12 months",
-#             priority="Medium",
-#             use_cases=["Advanced analytics", "Performance optimization"],
-#             key_resources=["Optimization", "Monitoring", "Scaling infrastructure"]
-#         )
-#     ]
-    
-#     resource_assets = ResourceAssets(
-#         use_case_resources=all_use_case_resources,
-#         platform_summary=platform_summary,
-#         implementation_roadmap=implementation_phases,
-#         total_resources_found=total_kaggle + total_huggingface + total_github
-#     )
-    
-#     return {"resource_assets": resource_assets}
-
 def clean_url(url: str) -> str:
-    """Clean URL by removing all trailing punctuation and quotes"""
     if not url:
         return ""
     
-    # Strip whitespace
     cleaned = url.strip()
     
-    # Remove all trailing punctuation, quotes, and brackets
     cleaned = re.sub(r'[.,;:!?)\]}\'\"]+$', '', cleaned)
     
-    # Remove any remaining trailing whitespace
     cleaned = cleaned.strip()
     
     return cleaned
 
 
 def extract_resources_from_search(search_results, platform: str, max_resources: int = 3) -> list:
-    """Extract platform-specific resources from search results"""
     
-    # Convert search results to string for processing
     results_text = str(search_results)
     
-    # Platform-specific URL patterns - more restrictive to avoid malformed URLs
     patterns = {
         'kaggle': r'https://(?:www\.)?kaggle\.com/(?:datasets|competitions|code)/[A-Za-z0-9\-_/]+',
         'huggingface': r'https://huggingface\.co/[A-Za-z0-9\-_./]+',
@@ -347,18 +176,15 @@ def extract_resources_from_search(search_results, platform: str, max_resources: 
     if platform.lower() not in patterns:
         return create_fallback_resources(platform, max_resources)
     
-    # Find URLs using regex
     url_pattern = patterns[platform.lower()]
     found_urls = re.findall(url_pattern, results_text, re.IGNORECASE)
     
-    # Clean and deduplicate URLs
     cleaned_urls = []
     for url in found_urls:
         cleaned = clean_url(url)
-        if cleaned and cleaned not in cleaned_urls and len(cleaned) > 20:  # Minimum URL length check
+        if cleaned and cleaned not in cleaned_urls and len(cleaned) > 20: 
             cleaned_urls.append(cleaned)
     
-    # Create resource objects
     resources = []
     for url in cleaned_urls[:max_resources]:
         title = generate_title_from_url(url, platform)
@@ -368,7 +194,6 @@ def extract_resources_from_search(search_results, platform: str, max_resources: 
             'platform': platform
         })
     
-    # If no valid URLs found, create fallback resources
     if not resources:
         resources = create_fallback_resources(platform, max_resources)
     
@@ -376,27 +201,22 @@ def extract_resources_from_search(search_results, platform: str, max_resources: 
 
 
 def generate_title_from_url(url: str, platform: str) -> str:
-    """Generate a meaningful title from URL"""
     try:
         parsed = urlparse(url)
         path_parts = [p for p in parsed.path.split('/') if p]
         
         if platform.lower() == 'kaggle' and len(path_parts) >= 3:
-            # Kaggle: /datasets/username/dataset-name
             dataset_name = path_parts[-1].replace('-', ' ').replace('_', ' ').title()
             return f"{dataset_name} Dataset"
         
         elif platform.lower() == 'huggingface' and len(path_parts) >= 2:
-            # HuggingFace: /username/model-name
             model_name = path_parts[-1].replace('-', ' ').replace('_', ' ').title()
             return f"{model_name} Model"
         
         elif platform.lower() == 'github' and len(path_parts) >= 2:
-            # GitHub: /username/repo-name
             repo_name = path_parts[-1].replace('-', ' ').replace('_', ' ').title()
             return f"{repo_name} Repository"
         
-        # Fallback: use last path component
         if path_parts:
             return path_parts[-1].replace('-', ' ').replace('_', ' ').title()
         
@@ -406,7 +226,6 @@ def generate_title_from_url(url: str, platform: str) -> str:
     return f"{platform.title()} Resource"
 
 def create_fallback_resources(platform: str, count: int = 3) -> list:
-    """Create fallback resources when search fails"""
     
     fallbacks = {
         'kaggle': [
@@ -438,7 +257,6 @@ def create_fallback_resources(platform: str, count: int = 3) -> list:
     return [{'url': r['url'], 'title': r['title'], 'platform': platform} for r in selected]
 
 def create_resource_description(title: str, platform: str, category: str) -> str:
-    """Create description for resource"""
     
     descriptions = {
         'kaggle': f"Kaggle dataset: {title} - Structured data for {category.lower()} analysis and model training",
@@ -449,7 +267,6 @@ def create_resource_description(title: str, platform: str, category: str) -> str
     return descriptions.get(platform.lower(), f"{platform} resource: {title}")
 
 def resource_collector(state: ResearchState):
-    """Collect resources for each use case"""
     use_cases = state["use_cases"]
     company_research = state["company_research"]
     
@@ -465,7 +282,6 @@ def resource_collector(state: ResearchState):
     for use_case in limited_use_cases:
         print(f"Collecting resources for: {use_case.title}")
         
-        # Create search queries
         base_query = f"{use_case.category} {company_research.Industry} {use_case.ai_ml_solution}"
         
         kaggle_query = f"kaggle dataset {base_query}"
@@ -473,24 +289,20 @@ def resource_collector(state: ResearchState):
         github_query = f"github {use_case.ai_ml_solution} implementation"
         
         try:
-            # Perform searches
             kaggle_results = tavily_search.invoke(kaggle_query)
             huggingface_results = tavily_search.invoke(huggingface_query)
             github_results = tavily_search.invoke(github_query)
             
-            # Extract resources
             kaggle_data = extract_resources_from_search(kaggle_results, 'kaggle', 3)
             huggingface_data = extract_resources_from_search(huggingface_results, 'huggingface', 3)
             github_data = extract_resources_from_search(github_results, 'github', 3)
             
         except Exception as e:
             print(f"Search error: {e}")
-            # Use fallback resources
             kaggle_data = create_fallback_resources('kaggle', 3)
             huggingface_data = create_fallback_resources('huggingface', 3)
             github_data = create_fallback_resources('github', 3)
         
-        # Convert to ResourceLink objects
         kaggle_resources = [
             ResourceLink(
                 title=r['title'],
@@ -515,7 +327,6 @@ def resource_collector(state: ResearchState):
             ) for r in github_data
         ]
         
-        # Create use case resource
         use_case_resource = UseCaseResource(
             use_case_title=use_case.title,
             category=use_case.category,
@@ -528,14 +339,12 @@ def resource_collector(state: ResearchState):
         
         all_use_case_resources.append(use_case_resource)
         
-        # Update counts
         total_kaggle += len(kaggle_resources)
         total_huggingface += len(huggingface_resources)
         total_github += len(github_resources)
         
         print(f"Found: {len(kaggle_resources)} Kaggle, {len(huggingface_resources)} HuggingFace, {len(github_resources)} GitHub")
     
-    # Create platform summary
     platform_summary = PlatformSummary(
         kaggle_count=total_kaggle,
         huggingface_count=total_huggingface,
@@ -545,7 +354,6 @@ def resource_collector(state: ResearchState):
         github_recommendations=[res.github_repositories[0].title for res in all_use_case_resources if res.github_repositories][:5]
     )
     
-    # Create implementation phases
     implementation_phases = [
         ImplementationPhase(
             phase_name="Quick Wins & Proof of Concept",
@@ -570,7 +378,6 @@ def resource_collector(state: ResearchState):
         )
     ]
     
-    # Create final resource assets
     resource_assets = ResourceAssets(
         use_case_resources=all_use_case_resources,
         platform_summary=platform_summary,
